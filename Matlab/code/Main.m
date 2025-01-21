@@ -8,9 +8,11 @@
 
 % THE CODE HAS BEEN SET ON SINGLE SECTION CR BY DEFAULT
 
+for i = 0:0.1:0.5
+    clear all; clc;
+    SingleSectionCR(i);
+end
 
-clear; clc;
-SingleSectionCR;
 %SeriesTypeCR
 %ConcentricTubeCR
 %SupportiveTypeCCR

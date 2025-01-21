@@ -4,23 +4,22 @@ from scipy.optimize import fsolve
 import matplotlib.pyplot as plt
 
 df = pd.read_csv('Matlab/code/SingleSectionCR_L0.60_N100_r0.0100_Tt10.50_Tt20.00.csv',header=None)
-print(df)
 
-x = []
-z = []
+df2 = pd.read_csv('Matlab/code/SingleSectionCR_L0.60_N100_r0.0100_Tt10.40_Tt20.00.csv',header=None)
+df3 = pd.read_csv('Matlab/code/SingleSectionCR_L0.60_N100_r0.0100_Tt10.30_Tt20.00.csv',header=None)
+dfArr = [df, df2, df3]
 
-for i, row in df.iterrows():
-    x.append(row[0])
-    z.append(row[2])
-
-
-def getCurvature(L,N):
+def getCurvature(df):
     """
     Get the curvature of the track.
     """
-    curvatureArr = []
-    curvaturePos = []
-    
+    x = []
+    z = []
+
+    for i, row in df.iterrows():
+        x.append(row[0])
+        z.append(row[2])
+
     dx_dt = np.gradient(np.array(x))
     dz_dt = np.gradient(np.array(z))
     velocity = np.array([[dx_dt[i], dz_dt[i]] for i in range(dx_dt.size)])
@@ -49,9 +48,13 @@ def getCurvature(L,N):
     return curvature
 
 
-curvatureArr = getCurvature(0.6, 100)
+curvatureArr = []
+for df in dfArr:
+    curvatureArr.append(getCurvature(df))
 print(curvatureArr)
-plt.plot(np.linspace(0,0.6,100-5), -curvatureArr[5:])
+for array in curvatureArr:
+    print(array)
+    plt.plot(np.linspace(0,0.6,100-5), -array[5:])
 plt.xlabel('Position along the track')
 plt.ylabel('Curvature')
 plt.title('Curvature along the track')

@@ -1,5 +1,5 @@
-function SingleSectionCR
-    clear all;
+function SingleSectionCR(Force)
+    %clear all;
     clc;
     hat=@(y)[0,-y(3),y(2);y(3),0,-y(1);-y(2),y(1),0];
     global p R j n m v u q w vs us vt ut qt wt vst ust vh uh vsh ush qh wh nLL mLL x y z X Y Z  %Make vars available in whole program
@@ -56,7 +56,7 @@ function SingleSectionCR
             Tt1 = 0;
             Tt2 = 0;
         else
-            Tt1 = 0.5;
+            Tt1 = Force;
             Tt2 = 0;
         end 
 
