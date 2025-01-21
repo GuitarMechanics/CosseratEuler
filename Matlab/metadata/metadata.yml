@@ -1,0 +1,18 @@
+metadata_version: 1
+name: Cosserat Rod-based Dynamic Modeling of Tendon-Driven Continuum Robots
+description: "This is a MATLAB code using for the dynamic modeling of Cosserat-Rod based tendon-driven continuum robots. The code has been developed in Robotics, Mechatronics, and Automation Laboratory (RMAL) at Ryerson University. \nThis code is distributed under the MIT license, and could be used, modified, and distributed for non-commercial purposes. The authors of the code and the paper are not liable to any damage caused by using this code.\nPlease refer if you use this code.\n\nDependencies: MATLAB 2019a"
+tags:
+- Dynamic Modeling
+- Continuum Robot
+- Tendon-Driven
+- MATLAB
+authors:
+- name: F. Jenabi-Sharifi
+  affiliations:
+  - name: Ryerson University
+- name: A. Jalali
+  affiliations:
+  - name: Ryerson University
+corresponding_contributor:
+  name: A. Jalali
+  email: Amir.Jalali@Ryerson.ca
