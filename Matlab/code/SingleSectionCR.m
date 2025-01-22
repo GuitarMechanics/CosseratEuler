@@ -1,7 +1,10 @@
 function SingleSectionCR(Force,length,resolution)
     %clear all;
     clc;
+    delete(gcp('nocreate')); % Close any existing parallel pool
+    parpool("threads",6); % Start parallel pool
     options = optimoptions(@fsolve,'MaxFunctionEvaluations', 10e8, 'MaxIterations', 10e6,'PlotFcn',@optimplotfval,'UseParallel',true); % Set options for fsolve
+    % options = optimoptions(@fsolve,'MaxFunctionEvaluations', 10e8, 'MaxIterations', 10e6,'UseParallel',true); % Set options for fsolve
     options.Display = 'iter-detailed';
     hat=@(y)[0,-y(3),y(2);y(3),0,-y(1);-y(2),y(1),0];
     global p R j n m v u q w vs us vt ut qt wt vst ust vh uh vsh ush qh wh nLL mLL x y z X Y Z  %Make vars available in whole program

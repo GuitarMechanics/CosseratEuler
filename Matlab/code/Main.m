@@ -10,7 +10,7 @@
 
 clear all; clc;
 forces = [70,80,90,100,110,120,130,140];
-resolution = 1000;
+resolution = 100;
 length = 1;
 for i = 1:8
     SingleSectionCR(forces(i),length,resolution)
