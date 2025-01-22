@@ -1,17 +1,21 @@
-function SingleSectionCR(Force)
+function SingleSectionCR(Force,length,resolution)
     %clear all;
     clc;
+    options = optimoptions(@fsolve,'MaxFunctionEvaluations', 10e8, 'MaxIterations', 10e6,'PlotFcn',@optimplotfval,'UseParallel',true); % Set options for fsolve
+    options.Display = 'iter-detailed';
     hat=@(y)[0,-y(3),y(2);y(3),0,-y(1);-y(2),y(1),0];
     global p R j n m v u q w vs us vt ut qt wt vst ust vh uh vsh ush qh wh nLL mLL x y z X Y Z  %Make vars available in whole program
     %Parameters
-    L = 0.6;                       %Length (before strain)
-    N = 100;                        %Spatial resolution
+    force = Force;
+    L = length;                       %Length (before strain)
+    N = resolution;                        %Spatial resolution
     E = 207e6;                     %Young's modulus
     r = 0.01;                     %Cross-section radius
     rt1 = [0.01;0;0];
     rt2 = [0;0.01;0];
     rho = 8000;                    %Density
-    g = [-9.81;0;0];               %Gravity
+    % g = [-9.81;0;0];               %Gravity
+    g = [0;0;0];               %Gravity(ignored)
     Bse = zeros(3);                %Material damping coefficients - shear and extension
     Bbt = 1e-6*eye(3);             %Material damping coefficients - bending and torsion
     C = 0.03*eye(3);               %Square-law-drag damping coefficients
@@ -46,7 +50,8 @@ function SingleSectionCR(Force)
     
     %Main Simulation
     i = 1;
-    fsolve(@staticIVP, zeros(6,1)); %Solve static BVP w/ shooting method
+    initial_guess = [0; 0; 0; 0; 0; 0]; % Adjust initial guess if needed
+    fsolve(@staticIVP, initial_guess, options); %Solve static BVP w/ shooting method
     applyStaticBDFalpha();
 %       visualize1();
     
@@ -56,11 +61,13 @@ function SingleSectionCR(Force)
             Tt1 = 0;
             Tt2 = 0;
         else
-            Tt1 = Force;
+            disp("Force")
+            Tt1 = force %% display the force
             Tt2 = 0;
         end 
-
-        fsolve(@dynamicIVP, [n{i-1,1}; m{i-1,1}]); %Solve semi-discretized PDE w/ shooting
+        disp("# of Position")
+        disp(i)
+        fsolve(@dynamicIVP, [n{i-1,1}; m{i-1,1}],options); %Solve semi-discretized PDE w/ shooting
         applyDynamicBDFalpha();
 %          visualize();
     end
@@ -218,13 +225,13 @@ function SingleSectionCR(Force)
 
    function visualize1()
         for j = 1 : N,  x(j) = p{i,j}(1);  y(j) = p{i,j}(2); z(j) = p{i,j}(3);   end
-        figure (2)
-        fig = plot3(z,y,x); axis([-0.05*L 1.1*L  -0.1*L 0.1*L -0.05*L 0.1*L]);
-        filename = sprintf('SingleSectionCR_L%.2f_N%d_r%.4f_Tt1%.2f_Tt2%.2f.csv', L, N, r, Tt1, Tt2);
-        csvwrite(filename, [z' y' x']);
-        xlabel('z (m)');  ylabel('y (m)'); zlabel('x (m)')
-        hold on; grid on;  drawnow;  pause(0.05);
+        % figure (2)
+        % fig = plot3(z,y,x); axis([-0.05*L 1.1*L  -0.1*L 0.1*L -0.05*L 0.1*L]);
+        % xlabel('z (m)');  ylabel('y (m)'); zlabel('x (m)')
+        % hold on; grid on;  drawnow;  pause(0.05);
+        filename = sprintf('csvfiles/SingleSectionCR_L%.2f_N%d_r%.4f_Tt1%.2f_Tt2%.2f.csv', L, N, r, Tt1, Tt2);
         fprintf(filename)
+        csvwrite(filename, [x' y' z']);
     end
 
 

@@ -34,8 +34,7 @@ def getCurvature(df):
     deriv_tangent_x = np.gradient(tangent_x)
     deriv_tangent_z = np.gradient(tangent_z)
     
-    dT_dt = np.array([ [deriv_tangent_x[i], deriv_tangent_z[i]] for i in range
-    (deriv_tangent_x.size)])
+    dT_dt = np.array([ [deriv_tangent_x[i], deriv_tangent_z[i]] for i in range(deriv_tangent_x.size)])
     
     length_dT_dt = np.sqrt(deriv_tangent_x * deriv_tangent_x + deriv_tangent_z * deriv_tangent_z)
     
@@ -60,9 +59,9 @@ plt.ylabel('Curvature')
 plt.title('Curvature along the track')
 plt.grid(True)
 plt.show()
-plt.plot(x,z)
-plt.xlabel('x')
-plt.ylabel('z')
-plt.axis([0,1,-1,1])
-plt.grid(True)
-plt.show()
+# plt.plot(x,z)
+# plt.xlabel('x')
+# plt.ylabel('z')
+# plt.axis([0,1,-1,1])
+# plt.grid(True)
+# plt.show()

@@ -8,10 +8,19 @@
 
 % THE CODE HAS BEEN SET ON SINGLE SECTION CR BY DEFAULT
 
-for i = 0:0.1:0.5
-    clear all; clc;
-    SingleSectionCR(i);
+clear all; clc;
+forces = [70,80,90,100,110,120,130,140];
+resolution = 1000;
+length = 1;
+for i = 1:8
+    SingleSectionCR(forces(i),length,resolution)
 end
+
+
+% for i = 0.05:0.15:0.8
+%     clear all; clc;
+%     SingleSectionCR(i)
+% end
 
 %SeriesTypeCR
 %ConcentricTubeCR
