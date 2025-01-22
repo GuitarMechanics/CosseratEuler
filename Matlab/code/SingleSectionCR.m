@@ -1,4 +1,4 @@
-function SingleSectionCR(Force,length,resolution)
+function SingleSectionCR(Force,length,resolution,timesteps)
     %clear all;
     clc;
     delete(gcp('nocreate')); % Close any existing parallel pool
@@ -12,19 +12,20 @@ function SingleSectionCR(Force,length,resolution)
     force = Force;
     L = length;                       %Length (before strain)
     N = resolution;                        %Spatial resolution
-    E = 207e6;                     %Young's modulus
+    E = 207e6;                     %Young's modulus // spring steel
     r = 0.01;                     %Cross-section radius
-    rt1 = [0.01;0;0];
-    rt2 = [0;0.01;0];
+    rt1 = [0.01;0;0];   % tendon 1 position vector
+    rt2 = [0;0.01;0];   
     rho = 8000;                    %Density
     % g = [-9.81;0;0];               %Gravity
     g = [0;0;0];               %Gravity(ignored)
     Bse = zeros(3);                %Material damping coefficients - shear and extension
-    Bbt = 1e-6*eye(3);             %Material damping coefficients - bending and torsion
+    % Bbt = 1e-6*eye(3);             %Material damping coefficients - bending and torsion
+    Bbt = 10e-2*eye(3);             %Material damping coefficients - bending and torsion
     C = 0.03*eye(3);               %Square-law-drag damping coefficients
     dt = 0.015;                    %Time step
     alpha = -0.2;                  %BDF-alpha parameter
-    STEPS = 300;                   %Number of timesteps to completion
+    STEPS = timesteps;                   %Number of timesteps to completion
     vstar = @(s)[0;0;1];           %Value of v when static and absent loading
     ustar = @(s)[0;0;0];           %Precurvature
     vsstar = @(s)[0;0;1]
@@ -59,7 +60,8 @@ function SingleSectionCR(Force,length,resolution)
 %       visualize1();
     
     for i = 2 : STEPS
-
+        % tt1 >> tension of the tendon 1 (x-direction)
+        % tt2 >> tension of the tendon 2 (y-direction)
        if i < 5
             Tt1 = 0;
             Tt2 = 0;
@@ -68,8 +70,10 @@ function SingleSectionCR(Force,length,resolution)
             Tt1 = force %% display the force
             Tt2 = 0;
         end 
-        disp("# of Position")
+        disp("# of Time Steps:")
         disp(i)
+        disp("of time steps")
+        disp(STEPS)
         fsolve(@dynamicIVP, [n{i-1,1}; m{i-1,1}],options); %Solve semi-discretized PDE w/ shooting
         applyDynamicBDFalpha();
 %          visualize();
@@ -135,7 +139,6 @@ function SingleSectionCR(Force,length,resolution)
             
         end
         E = [n{i,N} - nLL ;  m{i,N} - mLL];
-        
     end
 
     function [ps, Rs, ns, ms, vs, us, v, u] = staticODE(p,R,n,m)
@@ -232,7 +235,7 @@ function SingleSectionCR(Force,length,resolution)
         % fig = plot3(z,y,x); axis([-0.05*L 1.1*L  -0.1*L 0.1*L -0.05*L 0.1*L]);
         % xlabel('z (m)');  ylabel('y (m)'); zlabel('x (m)')
         % hold on; grid on;  drawnow;  pause(0.05);
-        filename = sprintf('csvfiles/SingleSectionCR_L%.2f_N%d_r%.4f_Tt1%.2f_Tt2%.2f.csv', L, N, r, Tt1, Tt2);
+        filename = sprintf('csvfiles/SpringSteel_L%.2f_N%d_r%.4f_Tt1%.2f.csv', L, N, r, Tt1);
         fprintf(filename)
         csvwrite(filename, [x' y' z']);
     end
@@ -249,13 +252,13 @@ function SingleSectionCR(Force,length,resolution)
     end
 
     for i = 1 : STEPS, U(i)=i*dt; X(i)=p{i,N}(1); Y(i)=p{i,N}(2); Z(i)=p{i,N}(3); end
-%     figure (1)    
-%     subplot(2,1,1)
-%     plot(U,X);
-%     xlabel('t (s)');  ylabel('x (m)'); title('Tip Displacement - X Component');
-%     subplot(2,1,2)
-%     plot(U,Y);
-%     xlabel('t (s)');  ylabel('y (m)'); title('Tip Displacement - Y Component');
+    figure (2)    
+    subplot(2,1,1)
+    plot(U,X);
+    xlabel('t (s)');  ylabel('x (m)'); title(sprintf('Tip Displacement - X Component (Force = %.2f)', force));
+    subplot(2,1,2)
+    plot(U,Z);
+    xlabel('t (s)');  ylabel('y (m)'); title(sprintf('Tip Displacement - Y Component (Force = %.2f)', force));
     visualize1()
 %     saveas(gcf, '../results/SingleSectionCR.png')
 

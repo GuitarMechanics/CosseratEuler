@@ -11,6 +11,17 @@ class CosseratBeam():
             self.x.append(row[0])
             self.z.append(row[2])
 
+    def __init__(self, force,resolution,length):
+        self.df = pd.read_csv(f"Matlab\code\csvfiles\SingleSectionCR_L{length:.2f}_N{resolution:0.0f}_r0.0100_Tt1{force:.2f}_Tt20.00.csv",header=None)
+        self.x = []
+        self.z = []
+        self.force = force
+        self.resolution = resolution
+        self.length = length
+        for i, row in self.df.iterrows():
+            self.x.append(row[0])
+            self.z.append(row[2])
+
     def getCurvature(self):
         """
         Get the curvature of the track.

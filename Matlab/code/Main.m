@@ -8,12 +8,23 @@
 
 % THE CODE HAS BEEN SET ON SINGLE SECTION CR BY DEFAULT
 
+% generlize >> t/EI (temporary)
+
 clear all; clc;
-forces = [70,80,90,100,110,120,130,140];
-resolution = 100;
-length = 1;
+E = 207e6; %Pa
+A = pi*(0.1)^2; %m^2
+unit_EA = E*A
+force_over_EA = [0.5e-05, 1e-05, 1.5e-05, 2e-05, 2.5e-05, 3e-05, 3.5e-05, 4e-05];
+resolution = 50;
+length = [0.2, 0,4, 0.6, 0.8, 1];
 for i = 1:8
-    SingleSectionCR(forces(i),length,resolution)
+    force = force_over_EA(i)*unit_EA;
+    try
+        SingleSectionCR(force,length,resolution, 300)
+    catch
+        resolution = resolution + 50;
+        SingleSectionCR(force,length,resolution, 300)
+    end
 end
 
 

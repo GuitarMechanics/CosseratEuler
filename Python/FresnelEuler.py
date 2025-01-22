@@ -39,9 +39,10 @@ class FresnelEuler:
         # print(xpos,ypos)
         return ([xpos,ypos])
 
-    def curvCalculator(self,tdl,pos):
+    def curvCalculator(self,tdl,posinput):
         if(tdl == 0):
-            return ([0,pos])
+            return ([0,posinput])
+        pos = posinput/2
         norm_xval = pos/self.armLen
         a_val = 2*abs(tdl) / self.r_val
         sqrt_val = math.sqrt(math.pi / a_val)
@@ -51,8 +52,8 @@ class FresnelEuler:
                         math.sin(a_val/2)*(self.fresnel_sin((norm_xval - 1)/sqrt_val) + self.fresnel_sin(1/sqrt_val)))
         xpos = sqrt_val * (math.sin(a_val/2)*(self.fresnel_cos((norm_xval - 1)/sqrt_val) + self.fresnel_cos(1/sqrt_val)) - \
                         math.cos(a_val/2)*(self.fresnel_sin((norm_xval - 1)/sqrt_val) + self.fresnel_sin(1/sqrt_val)))
-        xpos *= self.armLen
-        ypos *= self.armLen
+        xpos *= self.armLen * 2
+        ypos *= self.armLen * 2
         return([xpos,ypos])
     
     def getTDLfromInitCurvature(self,intialCurvature):
