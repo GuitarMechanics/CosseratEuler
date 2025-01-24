@@ -15,12 +15,11 @@ clear all; clc;
 E = 70e9; %Pa<<NiTi
 A = pi*(0.01)^2; %m^2
 unit_EA = E*A
-force_over_EA = ([1, 2, 3, 4, 5, 6,7,8,9,10]+10) * 1e-3;
+force_over_EA = [1, 2, 3, 4, 5, 6,7,8,9,10] * 0.01;
 % force_over_EA = [7e-05,8e-05];
 lengthvalues = [0.1 0.2 0.3];
 % lengthvalues = [0.8 1.0 1.2,1.4,1.6,1.8,2.0];
-% for lengthindex = 1:length(lengthvalues)
-for lengthindex = 1:2
+for lengthindex = 1:length(lengthvalues)
     clc;
     resolution = 50;
     timestepcount = 300

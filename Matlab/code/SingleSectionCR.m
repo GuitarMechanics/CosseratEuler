@@ -3,8 +3,8 @@ function SingleSectionCR(Force,length,resolution,timesteps)
     clc;
     delete(gcp('nocreate')); % Close any existing parallel pool
     parpool("threads",6); % Start parallel pool
-    options = optimoptions(@fsolve,'MaxFunctionEvaluations', 10e8, 'MaxIterations', 10e6,'PlotFcn',@optimplotfval,'UseParallel',true); % Set options for fsolve
-    % options = optimoptions(@fsolve,'MaxFunctionEvaluations', 10e8, 'MaxIterations', 10e6,'UseParallel',true); % Set options for fsolve
+    % options = optimoptions(@fsolve,'MaxFunctionEvaluations', 10e6, 'MaxIterations', 10e4,'PlotFcn',@optimplotfval,'UseParallel',true); % Set options for fsolve
+    options = optimoptions(@fsolve,'MaxFunctionEvaluations', 10e5, 'MaxIterations', 10e3,'UseParallel',true); % Set options for fsolve
     options.Display = 'iter-detailed';
     hat=@(y)[0,-y(3),y(2);y(3),0,-y(1);-y(2),y(1),0];
     global p R j n m v u q w vs us vt ut qt wt vst ust vh uh vsh ush qh wh nLL mLL x y z X Y Z  %Make vars available in whole program
@@ -12,7 +12,8 @@ function SingleSectionCR(Force,length,resolution,timesteps)
     force = Force;
     L = length;                       %Length (before strain)
     N = resolution;                        %Spatial resolution
-    E = 207e6;                     %Young's modulus // spring steel
+    % E = 207e9;                     %Young's modulus // spring steel
+    E = 70e9;                     %Young's modulus // NiTi
     r = 0.01;                     %Cross-section radius
     rt1 = [0.01;0;0];   % tendon 1 position vector
     rt2 = [0;0.01;0];   
@@ -43,7 +44,8 @@ function SingleSectionCR(Force,length,resolution,timesteps)
     %Dependent Parameter Calculations
     A = pi*r^2;                                 %Cross-sectional area
     J = diag([pi*r^4/4  pi*r^4/4  pi*r^4/2]);   %Inertia
-    G = E/( 2*(1+0.3) );                        %Shear modulus
+    % G = E/( 2*(1+0.3) );                        %Shear modulus / Spring Steel
+    G = E/( 2*(1+0.3) );                        %Shear modulus / NiTi
     Kse = diag([G*A, G*A, E*A]);                %Stiffness matrix - shear and extension
     Kbt = diag([E*J(1,1), E*J(2,2), G*J(3,3)]); %Stiffness matrix - bending and torsion
     ds = L/(N-1);                               %Grid distance (before strain)
@@ -62,11 +64,15 @@ function SingleSectionCR(Force,length,resolution,timesteps)
     for i = 2 : STEPS
         % tt1 >> tension of the tendon 1 (x-direction)
         % tt2 >> tension of the tendon 2 (y-direction)
+        disp("Force")
        if i < 5
             Tt1 = 0;
             Tt2 = 0;
+       elseif i < 50 %gradual increase of the force
+            Tt1 = force * i / 50;
+            Tt2 = 0;
         else
-            disp("Force")
+            % force applied to the
             Tt1 = force %% display the force
             Tt2 = 0;
         end 
@@ -231,11 +237,11 @@ function SingleSectionCR(Force,length,resolution,timesteps)
 
    function visualize1()
         for j = 1 : N,  x(j) = p{i,j}(1);  y(j) = p{i,j}(2); z(j) = p{i,j}(3);   end
-        % figure (2)
-        % fig = plot3(z,y,x); axis([-0.05*L 1.1*L  -0.1*L 0.1*L -0.05*L 0.1*L]);
-        % xlabel('z (m)');  ylabel('y (m)'); zlabel('x (m)')
-        % hold on; grid on;  drawnow;  pause(0.05);
-        filename = sprintf('csvfiles/SpringSteel_L%.2f_N%d_r%.4f_Tt1%.2f.csv', L, N, r, Tt1);
+        figure (2)
+        fig = plot3(z,y,x); axis([-0.05*L 1.1*L  -0.1*L 0.1*L -0.05*L 0.1*L]);
+        xlabel('z (m)');  ylabel('y (m)'); zlabel('x (m)')
+        hold on; grid on;  drawnow;  pause(0.05);
+        filename = sprintf('csvfiles/NiTi_L%.2f_N%d_r%.4f_Tt1%.2f.csv', L, N, r, Tt1);
         fprintf(filename)
         csvwrite(filename, [x' y' z']);
     end
@@ -252,13 +258,14 @@ function SingleSectionCR(Force,length,resolution,timesteps)
     end
 
     for i = 1 : STEPS, U(i)=i*dt; X(i)=p{i,N}(1); Y(i)=p{i,N}(2); Z(i)=p{i,N}(3); end
-    figure (2)    
+    figure (3)    
     subplot(2,1,1)
     plot(U,X);
     xlabel('t (s)');  ylabel('x (m)'); title(sprintf('Tip Displacement - X Component (Force = %.2f)', force));
     subplot(2,1,2)
     plot(U,Z);
     xlabel('t (s)');  ylabel('y (m)'); title(sprintf('Tip Displacement - Y Component (Force = %.2f)', force));
+    savefig(sprintf('NiTi_L%0.2f_Force%.2f.fig',L,force))
     visualize1()
 %     saveas(gcf, '../results/SingleSectionCR.png')
 
