@@ -1,6 +1,6 @@
 function SingleSectionCR(Force,length,resolution,timesteps)
     %clear all;
-    clc;
+    %clc;
     delete(gcp('nocreate')); % Close any existing parallel pool
     parpool("threads",6); % Start parallel pool
     % options = optimoptions(@fsolve,'MaxFunctionEvaluations', 10e6, 'MaxIterations', 10e4,'PlotFcn',@optimplotfval,'UseParallel',true); % Set options for fsolve
@@ -12,8 +12,8 @@ function SingleSectionCR(Force,length,resolution,timesteps)
     force = Force;
     L = length;                       %Length (before strain)
     N = resolution;                        %Spatial resolution
-    % E = 207e9;                     %Young's modulus // spring steel
-    E = 70e9;                     %Young's modulus // NiTi
+    E = 207e9;                     %Young's modulus // spring steel
+    % E = 70e9;                     %Young's modulus // NiTi
     r = 0.01;                     %Cross-section radius
     rt1 = [0.01;0;0];   % tendon 1 position vector
     rt2 = [0;0.01;0];   
@@ -241,7 +241,7 @@ function SingleSectionCR(Force,length,resolution,timesteps)
         fig = plot3(z,y,x); axis([-0.05*L 1.1*L  -0.1*L 0.1*L -0.05*L 0.1*L]);
         xlabel('z (m)');  ylabel('y (m)'); zlabel('x (m)')
         hold on; grid on;  drawnow;  pause(0.05);
-        filename = sprintf('csvfiles/NiTi_L%.2f_N%d_r%.4f_Tt1%.2f.csv', L, N, r, Tt1);
+        filename = sprintf('csvfiles/SpringSteel_L%.2f_N%d_r%.4f_Tt1%.2f.csv', L, N, r, Tt1);
         fprintf(filename)
         csvwrite(filename, [x' y' z']);
     end
@@ -265,7 +265,7 @@ function SingleSectionCR(Force,length,resolution,timesteps)
     subplot(2,1,2)
     plot(U,Z);
     xlabel('t (s)');  ylabel('y (m)'); title(sprintf('Tip Displacement - Y Component (Force = %.2f)', force));
-    savefig(sprintf('NiTi_L%0.2f_Force%.2f.fig',L,force))
+    savefig(sprintf('SpringSteel_L%0.2f_Force%.2f.fig',L,force))
     visualize1()
 %     saveas(gcf, '../results/SingleSectionCR.png')
 
