@@ -1,10 +1,7 @@
-function SingleSectionCR(Force,length,resolution,timesteps)
-    %clear all;
+function SingleSectionCR(Force,length,resolution,timesteps, crosssectionradius, youngsmodulus)
     %clc;
-    delete(gcp('nocreate')); % Close any existing parallel pool
-    parpool("threads",6); % Start parallel pool
     % options = optimoptions(@fsolve,'MaxFunctionEvaluations', 10e6, 'MaxIterations', 10e4,'PlotFcn',@optimplotfval,'UseParallel',true); % Set options for fsolve
-    options = optimoptions(@fsolve,'MaxFunctionEvaluations', 10e5, 'MaxIterations', 10e3,'UseParallel',true); % Set options for fsolve
+    options = optimoptions(@fsolve,'MaxFunctionEvaluations', 1e3, 'MaxIterations', 1e3,'UseParallel',true); % Set options for fsolve
     options.Display = 'iter-detailed';
     hat=@(y)[0,-y(3),y(2);y(3),0,-y(1);-y(2),y(1),0];
     global p R j n m v u q w vs us vt ut qt wt vst ust vh uh vsh ush qh wh nLL mLL x y z X Y Z  %Make vars available in whole program
@@ -12,27 +9,39 @@ function SingleSectionCR(Force,length,resolution,timesteps)
     force = Force;
     L = length;                       %Length (before strain)
     N = resolution;                        %Spatial resolution
-    E = 207e9;                     %Young's modulus // spring steel
+    E = youngsmodulus;                     %Young's modulus // spring steel
     % E = 70e9;                     %Young's modulus // NiTi
-    r = 0.01;                     %Cross-section radius
-    rt1 = [0.01;0;0];   % tendon 1 position vector
-    rt2 = [0;0.01;0];   
-    rho = 8000;                    %Density
+    r = crosssectionradius;                     %Cross-section radius, 0.01 in example
+    rt1 = [r;0;0];   % tendon 1 position vector
+    rt2 = [0;r;0];   
+    % rho = 8000;                    %Density
+    rho = 10;
     % g = [-9.81;0;0];               %Gravity
     g = [0;0;0];               %Gravity(ignored)
     Bse = zeros(3);                %Material damping coefficients - shear and extension
-    % Bbt = 1e-6*eye(3);             %Material damping coefficients - bending and torsion
-    Bbt = 10e-2*eye(3);             %Material damping coefficients - bending and torsion
+    % Bbt = 1e-6*eye(3);             %Material damping coefficients - bending and torsion // default set
+    % Bbt = 10e-4*eye(3);             %Material damping coefficients - bending and torsion, sus/niti
+    useAdaptiveTimeStep = false;
+    Bbt = 1e-6*eye(3)*1.9;   % silicone rubber
+    Bbtinitial = Bbt;
+    Bbtfinal = Bbtinitial*8.0/10;
+    % Bbt = 1e-6*eye(3)*100.0/100;   % silicone rubber
     C = 0.03*eye(3);               %Square-law-drag damping coefficients
-    dt = 0.015;                    %Time step
-    alpha = -0.2;                  %BDF-alpha parameter
-    STEPS = timesteps;                   %Number of timesteps to completion
+    % C = 0.03*eye(3)*1/100;               %Square-law-drag damping coefficients, silicone
+    % dt = 0.015;                    %Time step: sus/niti
+    dt = 1e-4*15.0/10;                    %Time step: silicone
+    dtinit = dt;
+    dtmax = 100*dt;
+    alpha = -0.02;                  %BDF-alpha parameter
+    StepMAX = timesteps;                   %Number of timesteps to completion
+    gradualForceStep = 600;
+    adaptiveTimeStepStart = gradualForceStep+20;
     vstar = @(s)[0;0;1];           %Value of v when static and absent loading
     ustar = @(s)[0;0;0];           %Precurvature
     vsstar = @(s)[0;0;1]
     usstar = @(s)[0;0;0]
     %Boundary Conditions
-    for i = 1 : STEPS
+    for i = 1 : StepMAX
         p{i,1} = [0;0;0];          %Clamped base
         R{i,1} = eye(3);
         q{i,1} = [0;0;0];
@@ -44,8 +53,8 @@ function SingleSectionCR(Force,length,resolution,timesteps)
     %Dependent Parameter Calculations
     A = pi*r^2;                                 %Cross-sectional area
     J = diag([pi*r^4/4  pi*r^4/4  pi*r^4/2]);   %Inertia
-    % G = E/( 2*(1+0.3) );                        %Shear modulus / Spring Steel
-    G = E/( 2*(1+0.3) );                        %Shear modulus / NiTi
+    % G = E/( 2*(1+0.3) );                        %Shear modulus / sus and nitu
+    G = E/( 2*(1+0.48) );                        %Shear modulus / silicone rubber
     Kse = diag([G*A, G*A, E*A]);                %Stiffness matrix - shear and extension
     Kbt = diag([E*J(1,1), E*J(2,2), G*J(3,3)]); %Stiffness matrix - bending and torsion
     ds = L/(N-1);                               %Grid distance (before strain)
@@ -59,32 +68,58 @@ function SingleSectionCR(Force,length,resolution,timesteps)
     initial_guess = [0; 0; 0; 0; 0; 0]; % Adjust initial guess if needed
     fsolve(@staticIVP, initial_guess, options); %Solve static BVP w/ shooting method
     applyStaticBDFalpha();
-%       visualize1();
-    
-    for i = 2 : STEPS
+    %       visualize1();
+    earlystopStack = 0;
+    for i = 2 : StepMAX
+        if earlystopStack >= 20
+            break
+        end
+        STEP = i;
+        % if i<5
+        %     Tt1 = 0;
+        %     Tt2 = 0;
         % tt1 >> tension of the tendon 1 (x-direction)
         % tt2 >> tension of the tendon 2 (y-direction)
-        disp("Force")
-       if i < 5
-            Tt1 = 0;
-            Tt2 = 0;
-       elseif i < 50 %gradual increase of the force
-            Tt1 = force * i / 50;
+        if i < gradualForceStep %gradual increase of the force
+            Tt1 = force * i / gradualForceStep; 
             Tt2 = 0;
         else
             % force applied to the
-            Tt1 = force %% display the force
+            Tt1 = force; %% display the force
             Tt2 = 0;
+            if useAdaptiveTimeStep && i > adaptiveTimeStepStart
+                % adaptive time step to reach convergence point faster
+                % also adjust the damping(gradually lowers the Bbt)
+                dt = (dtmax-dtinit)*(i-adaptiveTimeStepStart)/...
+                (StepMAX-adaptiveTimeStepStart) + dtinit;
+                Bbt = (Bbtfinal-Bbtinitial)*(i-adaptiveTimeStepStart)/...
+                (StepMAX-adaptiveTimeStepStart) + Bbtinitial;
+                % fprintf(sprintf('Adaptive Mod. applied: time step: %.4f, damping(ratio): %0.2f\n',dt, (Bbt/Bbtinitial)));
+                bratio = Bbt/Bbtinitial;
+                str = sprintf('Adaptive Mod. applied: time step: %.6f, damping(ratio): %0.2f\n',dt, bratio);
+                parfor workeri = 1:6
+                    if workeri == 1
+                        fprintf('%s',str);
+                    end
+                end
+            end
         end 
-        disp("# of Time Steps:")
-        disp(i)
-        disp("of time steps")
-        disp(STEPS)
-        fsolve(@dynamicIVP, [n{i-1,1}; m{i-1,1}],options); %Solve semi-discretized PDE w/ shooting
+        fprintf(sprintf('%d of %d, r = %0.3f, l = %0.3f, f = %0.2f, EarlystopStack = %d\n',i,StepMAX,r,L,force,earlystopStack))
+        [~, ~, exitflag, output] = fsolve(@dynamicIVP, [n{i-1,1}; m{i-1,1}],options); %Solve semi-discretized PDE w/ shooting
         applyDynamicBDFalpha();
-%          visualize();
+        visualize();
+        if exitflag <= 0
+            fprintf(sprintf('Exit flag %d, check values\n',exitflag))
+            dummyinput = input("Press enter to continue...");
+        end
+        if output.iterations == 0
+            earlystopStack = earlystopStack + 1;
+        else
+            earlystopStack = 0;
+        end
+        
     end
-
+    
     
     
     %Function Definitions
@@ -238,34 +273,40 @@ function SingleSectionCR(Force,length,resolution,timesteps)
    function visualize1()
         for j = 1 : N,  x(j) = p{i,j}(1);  y(j) = p{i,j}(2); z(j) = p{i,j}(3);   end
         figure (2)
-        fig = plot3(z,y,x); axis([-0.05*L 1.1*L  -0.1*L 0.1*L -0.05*L 0.1*L]);
+        fig = plot3(z,y,x); axis([-0.05*L 1.1*L  -0.1*L 1.1*L -0.05*L 1.1*L]);
         xlabel('z (m)');  ylabel('y (m)'); zlabel('x (m)')
-        hold on; grid on;  drawnow;  pause(0.05);
-        filename = sprintf('csvfiles/SpringSteel_L%.2f_N%d_r%.4f_Tt1%.2f.csv', L, N, r, Tt1);
+        hold on; 
+        grid on;  drawnow;  pause(0.05);
+        filename = sprintf('csvfiles/SiliconeRubber/SiliconeRubber_L%.3f_N%d_r%.3f_Tt1%.2f.csv', L, N, r, Tt1);
         fprintf(filename)
         csvwrite(filename, [x' y' z']);
     end
 
 
     function visualize()
-        if rem(i,10) == 0; 
+        if rem(i,100) == 0
         for j = 1 : N,  x(j) = p{i,j}(1);  y(j) = p{i,j}(2); z(j) = p{i,j}(3);   end
         figure (1)
         fig = plot3(z,y,x); axis([-0.05*L 1.1*L  -0.1*L 0.1*L -0.05*L 0.1*L]);
         xlabel('z (m)');  ylabel('y (m)'); zlabel('x (m)')
-        hold on; grid on;  drawnow;  pause(0.05);
+        % hold on; grid on;  drawnow;  pause(0.05);
+        title(sprintf('Current Configuration: time step %d',i));
+        hold on; grid on; drawnow; pause(0.05);
         end
     end
 
-    for i = 1 : STEPS, U(i)=i*dt; X(i)=p{i,N}(1); Y(i)=p{i,N}(2); Z(i)=p{i,N}(3); end
+    for i = 1 : STEP, U(i)=i*dt; X(i)=p{i,N}(1); Y(i)=p{i,N}(2); Z(i)=p{i,N}(3); end
     figure (3)    
-    subplot(2,1,1)
+    subplot(3,1,1)
     plot(U,X);
     xlabel('t (s)');  ylabel('x (m)'); title(sprintf('Tip Displacement - X Component (Force = %.2f)', force));
-    subplot(2,1,2)
+    subplot(3,1,2)
     plot(U,Z);
+    xlabel('t (s)');  ylabel('y (m)'); title(sprintf('Tip Displacement - Z Component (Force = %.2f)', force));
+    subplot(3,1,3)
+    plot(U,Y);
     xlabel('t (s)');  ylabel('y (m)'); title(sprintf('Tip Displacement - Y Component (Force = %.2f)', force));
-    savefig(sprintf('SpringSteel_L%0.2f_Force%.2f.fig',L,force))
+    savefig(sprintf('MatlabFigs/SiliconeRubber/SiliconeRubber_L%0.3f_r%0.3f_Force%.2f.fig',L,r,force))
     visualize1()
 %     saveas(gcf, '../results/SingleSectionCR.png')
 

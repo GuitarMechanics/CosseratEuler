@@ -12,13 +12,13 @@ class CosseratBeamFile():
         CAUTION: The forceratio is scaled by 1e-3.
         example: 123 -> 0.123
         '''
-        filename = filelocation.split("/")[-1].split(".csv")[0]
+        filename = filelocation.split("\\")[-1].split(".csv")[0]
         filename = filename.split("_")
 
         if filename[0] == "NiTi":
             E_val = 70e9
-        elif filename[0] == "SpringSteel":
-            E_val = 207e9
+        elif filename[0] == "SUS304":
+            E_val = 200e9
         else:
             raise Exception("The material is not recognized.")
         
@@ -28,6 +28,7 @@ class CosseratBeamFile():
         self.forceratio = forceval
         self.length = filename[1].split("L")[1]
         self.resolution = filename[2].split("N")[1]
+        self.radius = filename[3].split("r")[1]
         
         self.df = pd.read_csv(filelocation,header=None)
         self.x = []

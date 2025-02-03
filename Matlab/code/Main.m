@@ -10,6 +10,10 @@
 
 % generlize >> rl/EI (temporary)
 
+%최적화 시도해볼것:
+%스레드 생성을 메인으로 빼기(계속 만들었다 지웠다 하다보니 발적화되는거같다)
+%clc 적절히 배치해서 콘솔 메모리 확보
+
 clear all; clc;
 E = 207e9; %Pa<<springsteel
 % E = 70e9; %Pa<<NiTi
