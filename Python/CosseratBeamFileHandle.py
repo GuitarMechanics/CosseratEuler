@@ -16,19 +16,25 @@ class CosseratBeamFile():
         filename = filename.split("_")
 
         if filename[0] == "NiTi":
-            E_val = 70e9
+            self.E_val = 70e9
         elif filename[0] == "SUS304":
-            E_val = 200e9
+            self.E_val = 200e9
+        elif filename[0] == "SiliconeRubber":
+            self.E_val = 50e6
         else:
             raise Exception("The material is not recognized.")
         
-        A_val = 0.01**2*np.pi
         forceval = filename[4].split("Tt1")[1]
-        forceval = int(np.round(float(forceval)/(E_val*A_val)*1e3))
-        self.forceratio = forceval
-        self.length = filename[1].split("L")[1]
-        self.resolution = filename[2].split("N")[1]
-        self.radius = filename[3].split("r")[1]
+        self.forceval = float(forceval)
+        self.length = float(filename[1].split("L")[1])
+        self.resolution = int(filename[2].split("N")[1])
+        self.radius = float(filename[3].split("r")[1])
+        A_val = self.radius**2*np.pi
+        I_val = self.radius**4*np.pi/64
+        self.forceratio = int(np.round(self.forceval*self.length*self.radius/(self.E_val*I_val)))
+        self.LRratio = np.round(self.length / self.radius, 3)
+
+        self.segments = np.linspace(0,self.length,self.resolution)
         
         self.df = pd.read_csv(filelocation,header=None)
         self.x = []
@@ -37,20 +43,16 @@ class CosseratBeamFile():
             self.x.append(row[0])
             self.z.append(row[2])
 
-    # def __init__(self, force,resolution,length):
-    #     '''
-    #     If the force, resolution and length are given, the data is read from the file. Default location is Matlab\code\csvfiles, starting with SingleSectionCR_L.
-    #     '''
-    #     self.df = pd.read_csv(f"Matlab\code\csvfiles\SingleSectionCR_L{length:.2f}_N{resolution:0.0f}_r0.0100_Tt1{force:.2f}_Tt20.00.csv",header=None)
-    #     self.x = []
-    #     self.z = []
-    #     self.force = force
-    #     self.resolution = resolution
-    #     self.length = length
-    #     for i, row in self.df.iterrows():
-    #         self.x.append(row[0])
-    #         self.z.append(row[2])
-        
+    def getAngles(self, normalized = False):
+        retList = []
+        for i in range(self.resolution-1):
+            retList.append(90-np.rad2deg(np.arctan2(self.z[i+1]-self.z[i],\
+                                      self.x[i+1]-self.x[i])))
+        if normalized:
+            return np.linspace(0,1,self.resolution)[:-1], np.array(retList)
+        else:
+            return self.segments[:-1], np.array(retList)
+      
     def getCurvature(self,returnIntercept = False):
         """
         Get the curvature of the track.
@@ -84,16 +86,19 @@ class CosseratBeamFile():
         d2z_dt2 = np.gradient(dz_dt)
         curvature = (d2x_dt2 * dz_dt - dx_dt * d2z_dt2) / ((dx_dt*dx_dt + dz_dt*dz_dt)**1.5)
         if not returnIntercept:
-            return curvature
+            return self.segments[2:-2], curvature[2:-2]
         else:
             pos = np.linspace(0,float(self.length),int(self.resolution))[-2:2]
             linearreg = LinearRegression().fit(np.array(curvature)[2:-2].reshape(-1,1),np.array(pos).reshape(-1,1))
             return curvature, linearreg.intercept_[0]
 
 
-    def returnCurvature(self, returnIntercept = False):
-        curvature = self.getCurvature()
-        return np.linspace(0,float(self.length),int(self.resolution))[2:-2], curvature[2:-2]
+    def returnCurvature(self, normalized = False):
+        segment, curvature = self.getCurvature()
+        if normalized == False:
+            return segment, curvature
+        else:
+            return np.linspace(0,1,self.resolution)[2:-2], curvature * self.radius**2 / self.length
     
     def returnCurvLinIntercept(self):
         '''
