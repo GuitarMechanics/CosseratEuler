@@ -49,7 +49,7 @@ class CosseratBeamFile():
             retList.append(90-np.rad2deg(np.arctan2(self.z[i+1]-self.z[i],\
                                       self.x[i+1]-self.x[i])))
         if normalized:
-            return np.linspace(0,1,self.resolution)[:-1], np.array(retList)
+            return self.segments[:-1]/self.radius, np.array(retList)
         else:
             return self.segments[:-1], np.array(retList)
       
