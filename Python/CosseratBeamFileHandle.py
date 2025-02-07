@@ -11,6 +11,8 @@ class CosseratBeamFile():
 
         CAUTION: The forceratio is scaled by 1e-3.
         example: 123 -> 0.123
+
+        The option normalized peforms re-scaling the size of the beam. After normailzation, the beam's length becomes 1.
         '''
         filename = filelocation.split("\\")[-1].split(".csv")[0]
         filename = filename.split("_")
@@ -49,11 +51,11 @@ class CosseratBeamFile():
             retList.append(90-np.rad2deg(np.arctan2(self.z[i+1]-self.z[i],\
                                       self.x[i+1]-self.x[i])))
         if normalized:
-            return self.segments[:-1]/self.radius, np.array(retList)
+            return self.segments[:-1], np.array(retList)
         else:
             return self.segments[:-1], np.array(retList)
       
-    def getCurvature(self,returnIntercept = False):
+    def getCurvature(self,normalize = False):
         """
         Get the curvature of the track.
         if returnIntercept is True, the linear regression intercept of the curvature is returned.
@@ -85,12 +87,10 @@ class CosseratBeamFile():
         d2x_dt2 = np.gradient(dx_dt)
         d2z_dt2 = np.gradient(dz_dt)
         curvature = (d2x_dt2 * dz_dt - dx_dt * d2z_dt2) / ((dx_dt*dx_dt + dz_dt*dz_dt)**1.5)
-        if not returnIntercept:
+        if not normalize:
             return self.segments[2:-2], curvature[2:-2]
         else:
-            pos = np.linspace(0,float(self.length),int(self.resolution))[-2:2]
-            linearreg = LinearRegression().fit(np.array(curvature)[2:-2].reshape(-1,1),np.array(pos).reshape(-1,1))
-            return curvature, linearreg.intercept_[0]
+            return self.segments[2:-2] / self.length, curvature[2:-2] * self.length
 
 
     def returnCurvature(self, normalized = False):
@@ -120,7 +120,31 @@ class CosseratBeamFile():
         plt.grid(True)
         plt.show()
     
-    def exportCurvature(self, filename):
-        curvature = self.getCurvature()
-        pd.DataFrame(curvature).to_csv(filename, index=False, header=False)
-        print('Curvature exported to ' + filename)
+    def getEquivCCcurvature(self, normalized = False):
+        angle = np.deg2rad(self.getAngles()[-1][-1])
+        if normalized:
+            return angle
+        else:
+            return angle/self.length
+
+    def getCurvatureInfo(self, normalized = False, exportBeamInfo = False):
+        '''
+        returns: [initial curvature, final curvature, equivalent CC curvature, lr_ratio, forceratio]
+        If exportBeamInfo == True, length, radius are appended
+        '''
+        seg, curvature = self.getCurvature(normalized)
+        X = seg[:10].reshape(-1,1)
+        curvature = curvature[:10]
+
+        model = LinearRegression()
+        model.fit(X,curvature)
+        curv_initfinal = model.predict(np.array([[0], [1 if normalized else self.length]]))
+        curv_equivcc = self.getEquivCCcurvature(normalized)
+
+        retList = [curv_initfinal[0], curv_initfinal[1], curv_equivcc, self.LRratio, self.forceratio]
+        if exportBeamInfo==False:
+            return retList
+        else:
+            retList.append(self.length)
+            retList.append(self.radius)
+            return retList

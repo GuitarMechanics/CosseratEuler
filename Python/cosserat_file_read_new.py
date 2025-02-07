@@ -10,7 +10,7 @@ class MainShell(cmd.Cmd):
         os.system('cls' if os.name == 'nt' else 'clear')
         self.intro = 'Cosserat Analyzer'
         self.prompt = '(CosseratAnalyzer)'
-        materials = ['SUS304', 'NiTi', 'SiliconeRubber']
+        materials = ['SUS304', 'NiTi_past', 'SiliconeRubber']
         materialIndex = int(input('Select material: SUS304[0], NiTi[1], SiliconeRubber[2]'))
         path = f'Matlab/code/csvfiles/{materials[materialIndex]}/*.csv'
 
@@ -24,6 +24,7 @@ class MainShell(cmd.Cmd):
         for beam in self.cbf_list:
             if (beam.radius, beam.length, beam.LRratio) not in self.dimensions:
                 self.dimensions.append((beam.radius, beam.length, beam.LRratio))
+                print(f'Loaded beam data: L {beam.length} r {beam.radius} LRratio {beam.LRratio}')
         self.dimensions.sort(key = lambda x:x[2])
 
     def do_plot_all(self, *arg):
@@ -33,13 +34,14 @@ class MainShell(cmd.Cmd):
                 if (beam.radius, beam.length) == (dim[0], dim[1]):
                     tmplist.append(beam)
             tmplist.sort(key = lambda x:x.forceratio)
-            plt.figure()
+            plt.figure(figsize=(8,6))
+            plt.title(f'L = f{beam.length} r = {beam.radius} LR_ratio = {beam.LRratio}')
             for beam in tmplist:
                 plt.subplot(131)
                 plt.plot(beam.x, beam.z, label = str(beam.forceratio))
                 plt.title("Configuration")
                 plt.subplot(132)
-                segment, curv = beam.returnCurvature(normalized = True)
+                segment, curv = beam.returnCurvature(normalized = False)
                 plt.plot(segment, curv, label=str(beam.forceratio))
                 plt.title("Curvature")
                 plt.subplot(133)
@@ -138,6 +140,20 @@ class MainShell(cmd.Cmd):
         plt.legend()
         plt.tight_layout()
         plt.show()
+
+    def do_plot_normalized_curvature_all(self, *arg):
+        lr_ratio_upper = float(input('Max. l_r ratio? \n'))
+        lr_ratio_lower = float(input('Min. l_r ratio? \n'))
+        
+        plt.figure()
+        for beam in self.cbf_list:
+            if beam.LRratio <= lr_ratio_upper and beam.LRratio >= lr_ratio_lower:
+                x, y = beam.getCurvature(normalize = True)
+                print(f'plotted curvature: L {beam.length} r {beam.radius} Fr {beam.forceratio}')
+                plt.plot(x,y)
+        plt.title(f'Curvature plot: LR_ratio {lr_ratio_lower} to {lr_ratio_upper}')
+        plt.show()
+
 
     def do_quit(self, *arg):
         return True
