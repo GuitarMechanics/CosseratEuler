@@ -25,7 +25,7 @@ class CosseratBeamFile():
             self.E_val = 50e6
         else:
             raise Exception("The material is not recognized.")
-        
+        self.material = filename[0]
         forceval = filename[4].split("Tt1")[1]
         self.forceval = float(forceval)
         self.length = float(filename[1].split("L")[1])
