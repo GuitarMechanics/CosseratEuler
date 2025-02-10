@@ -8,10 +8,6 @@ class CosseratBeamFile():
         '''
         If the filelocation is given, the data is read from the file.
         Also reveals the beam's information from the file name.
-
-        CAUTION: The forceratio is scaled by 1e-3.
-        example: 123 -> 0.123
-
         The option normalized peforms re-scaling the size of the beam. After normailzation, the beam's length becomes 1.
         '''
         filename = filelocation.split("\\")[-1].split(".csv")[0]

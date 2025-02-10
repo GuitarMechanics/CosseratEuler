@@ -10,9 +10,10 @@ class MainShell(cmd.Cmd):
         os.system('cls' if os.name == 'nt' else 'clear')
         self.intro = 'Cosserat Analyzer'
         self.prompt = '(CosseratAnalyzer)'
-        materials = ['SUS304', 'NiTi_past', 'SiliconeRubber']
+        materials = ['SUS304', 'NiTi_fixed', 'SiliconeRubber']
         materialIndex = int(input('Select material: SUS304[0], NiTi[1], SiliconeRubber[2]'))
         path = f'Matlab/code/csvfiles/{materials[materialIndex]}/*.csv'
+        self.materialName = 'NiTi' if materialIndex == 1 else materials[materialIndex]
 
         file_list = glob.glob(path)
         self.cbf_list = []
@@ -30,29 +31,40 @@ class MainShell(cmd.Cmd):
     def do_plot_all(self, *arg):
         for dim in self.dimensions:
             tmplist = []
+            forceratio = 0
             for beam in self.cbf_list:
                 if (beam.radius, beam.length) == (dim[0], dim[1]):
                     tmplist.append(beam)
             tmplist.sort(key = lambda x:x.forceratio)
-            plt.figure(figsize=(8,6))
-            plt.title(f'L = f{beam.length} r = {beam.radius} LR_ratio = {beam.LRratio}')
+            plt.figure(figsize=(15,6))
             for beam in tmplist:
+                forceratio = beam.forceratio
+                plt.suptitle(f'{self.materialName}, L = {beam.length} r = {beam.radius} LR_ratio = {beam.LRratio}')
                 plt.subplot(131)
                 plt.plot(beam.x, beam.z, label = str(beam.forceratio))
                 plt.title("Configuration")
+                plt.xlabel('x-coordinate')
+                plt.ylabel('y-coordinate')
+                plt.legend(title='Force ratio')
                 plt.subplot(132)
                 segment, curv = beam.returnCurvature(normalized = False)
                 plt.plot(segment, curv, label=str(beam.forceratio))
                 plt.title("Curvature")
+                plt.xlabel('Curve length along the track')
+                plt.ylabel('Curvature')
+                plt.legend(title='Force ratio')
                 plt.subplot(133)
                 segment, ang = beam.getAngles(normalized = False)
                 plt.plot(segment, ang, label = str(beam.forceratio))
-            plt.legend()
+                plt.title("Angle of tangent")
+                plt.xlabel('Curve length along the track')
+                plt.ylabel('Angle of tangent')
+                plt.legend(title='Force ratio')
             # plt.axis('equal')
-            plt.title(f'Radius {dim[0]}, Length {dim[1]}, LR_ratio = {dim[2]}')
             # plt.ylim(0,0.15)
             plt.tight_layout()
-            plt.show()
+            # plt.show()
+            plt.savefig(f'Python/figs/totalfigs/{self.materialName}_r{dim[0]}_l{dim[1]}.png')
             # dummy = input('Draw next?')
     
     def do_plot_curvature_all(self, *arg):
