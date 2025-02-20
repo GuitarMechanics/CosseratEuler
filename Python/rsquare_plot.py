@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-df = pd.read_csv('Python/curvature_r2.csv')
+df = pd.read_csv('Python/curvature_r2_normalized.csv')
 print(df)
 plt.figure(figsize = (16,9))
 plt.suptitle('R^2 score distribution')
@@ -51,5 +51,5 @@ sns.boxplot(y = 'R2score',
             )
 
 plt.tight_layout()
-plt.savefig('Python/Curvature_distribution.png')
+plt.savefig('Python/Curvature_distribution_normalized.png')
 plt.show()
