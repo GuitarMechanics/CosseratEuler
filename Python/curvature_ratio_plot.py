@@ -6,9 +6,21 @@ df = pd.read_excel('Python/curvature_reginfo_xlvers.xlsx',sheet_name = 'curvatur
 
 sns.scatterplot(
     data=df,
-    x = 'lrratio',
-    y = 'inter/avg',
-    hue = 'Fratio',
-    palette = 'Set2',
+    x = 'inter/avg',
+    y = 'm',
+    # hue = 'Fratio',
+    # palette = 'Set2'
+    hue = 'lrratio'
 )
 plt.show()
+
+# # Create a polar plot
+# plt.figure()
+# ax = plt.subplot(111, projection='polar')
+# sns.scatterplot(
+#     data=df,
+#     x='slope(atan)deg',
+#     y='lrratio',
+#     ax=ax
+# )
+# plt.show()
