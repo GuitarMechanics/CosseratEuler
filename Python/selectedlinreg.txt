@@ -1,0 +1,39 @@
+inter/avg
+Fratio: 5 | Slope: [0.00272999] | Intercept: [1.00582033] | R2 Score: 0.9952504900277439 | slope/FRatio: [0.000546]
+Fratio: 7 | Slope: [0.00370061] | Intercept: [1.01023598] | R2 Score: 0.9979530361154519 | slope/FRatio: [0.00052866]
+Fratio: 9 | Slope: [0.00469936] | Intercept: [1.01458932] | R2 Score: 0.9977044401688068 | slope/FRatio: [0.00052215]
+Fratio: 11 | Slope: [0.00580363] | Intercept: [1.01813073] | R2 Score: 0.9986676904435017 | slope/FRatio: [0.0005276]
+Fratio: 13 | Slope: [0.00722307] | Intercept: [1.01798257] | R2 Score: 0.9993662353914055 | slope/FRatio: [0.00055562]
+Fratio: 15 | Slope: [0.00935941] | Intercept: [1.00707794] | R2 Score: 0.9985269073772979 | slope/FRatio: [0.00062396]
+
+midang/tipang
+Fratio: 5 | Slope: [0.0006825] | Intercept: [0.50145508] | R2 Score: 0.995250490027744 | slope/FRatio: [0.0001365]
+Fratio: 7 | Slope: [0.00092515] | Intercept: [0.50255899] | R2 Score: 0.9979530361154519 | slope/FRatio: [0.00013216]
+Fratio: 9 | Slope: [0.00117484] | Intercept: [0.50364733] | R2 Score: 0.9977044401688068 | slope/FRatio: [0.00013054]
+Fratio: 11 | Slope: [0.00145091] | Intercept: [0.50453268] | R2 Score: 0.9986676904435017 | slope/FRatio: [0.0001319]
+Fratio: 13 | Slope: [0.00180577] | Intercept: [0.50449564] | R2 Score: 0.9993662353914053 | slope/FRatio: [0.00013891]
+Fratio: 15 | Slope: [0.00233985] | Intercept: [0.50176948] | R2 Score: 0.9985269073772979 | slope/FRatio: [0.00015599]
+
+inter/avg - avg/inter
+Fratio: 5 | Slope: [0.00506108] | Intercept: [0.01584162] | R2 Score: 0.9943410295911909 | slope/FRatio: [0.00101222]
+Fratio: 7 | Slope: [0.00668641] | Intercept: [0.02764337] | R2 Score: 0.9965967697839365 | slope/FRatio: [0.0009552]
+Fratio: 9 | Slope: [0.00828587] | Intercept: [0.03990683] | R2 Score: 0.9957786259711513 | slope/FRatio: [0.00092065]
+Fratio: 11 | Slope: [0.00997934] | Intercept: [0.0517125] | R2 Score: 0.9968285476643308 | slope/FRatio: [0.00090721]
+Fratio: 13 | Slope: [0.01208972] | Intercept: [0.05870257] | R2 Score: 0.9977944356636577 | slope/FRatio: [0.00092998]
+Fratio: 15 | Slope: [0.01516799] | Intercept: [0.05133421] | R2 Score: 0.9992537356380325 | slope/FRatio: [0.0010112]
+
+16AR+KR-8=1/AR/KR<<<아님
+Fratio: 5 | Slope: [0.01364995] | Intercept: [1.02910163] | R2 Score: 0.995250490027744 | slope/FRatio: [0.00272999]
+Fratio: 7 | Slope: [0.01850303] | Intercept: [1.05117989] | R2 Score: 0.997953036115452 | slope/FRatio: [0.00264329]
+Fratio: 9 | Slope: [0.02349679] | Intercept: [1.0729466] | R2 Score: 0.9977044401688068 | slope/FRatio: [0.00261075]
+Fratio: 11 | Slope: [0.02901815] | Intercept: [1.09065363] | R2 Score: 0.9986676904435017 | slope/FRatio: [0.00263801]
+Fratio: 13 | Slope: [0.03611534] | Intercept: [1.08991283] | R2 Score: 0.9993662353914055 | slope/FRatio: [0.0027781]
+Fratio: 15 | Slope: [0.04679704] | Intercept: [1.03538968] | R2 Score: 0.9985269073772979 | slope/FRatio: [0.0031198]
+
+KR/AR
+Fratio: 5 | Slope: [0.00251782] | Intercept: [2.00810999] | R2 Score: 0.9942073287469967 | slope/FRatio: [0.00050356]
+Fratio: 7 | Slope: [0.0033124] | Intercept: [2.0142696] | R2 Score: 0.9963067348218108 | slope/FRatio: [0.0004732]
+Fratio: 9 | Slope: [0.00408282] | Intercept: [2.0208103] | R2 Score: 0.9952382228027618 | slope/FRatio: [0.00045365]
+Fratio: 11 | Slope: [0.00488293] | Intercept: [2.02737075] | R2 Score: 0.9961279742201684 | slope/FRatio: [0.0004439]
+Fratio: 13 | Slope: [0.00585982] | Intercept: [2.03199956] | R2 Score: 0.9969343843220843 | slope/FRatio: [0.00045076]
+Fratio: 15 | Slope: [0.00724668] | Intercept: [2.03070652] | R2 Score: 0.9990394475323227 | slope/FRatio: [0.00048311]
