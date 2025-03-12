@@ -3,15 +3,16 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import clipboard
 from math import pi
+import numpy as np
 clipboard.copy('C:\\Users\\user\\Desktop\\codes\\cosseratEuler\\Python\\excelfigs')
-df = pd.read_excel('Python/curvature_reginfo_xlvers.xlsx',sheet_name = 'curvature_reginfos', engine='openpyxl')
+df = pd.read_excel('Python/curvature_reginfo_xlvers_gpt.xlsx',sheet_name = 'pade_sols', engine='openpyxl')
 # plt.xlim([0,52])
 # plt.ylim([0,1.2])
 sns.scatterplot(
     data=df,
     x = df['lrratio'],
     # y = (df['tipang'])/df['inter/avg'],
-    y = (df['inter/avg'] - 1/df['inter/avg']) / df['lrratio'],
+    y = df['mod2_pct'],
     hue = 'Fratio',
     palette = 'Set2'
     # hue = 'tipang'
