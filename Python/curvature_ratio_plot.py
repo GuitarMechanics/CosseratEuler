@@ -10,12 +10,12 @@ df = pd.read_excel('Python/curvature_reginfo_xlvers_gpt.xlsx',sheet_name = 'pade
 # plt.ylim([0,1.2])
 sns.scatterplot(
     data=df,
-    x = df['lrratio'],
+    x = df['inter/avg'],
     # y = (df['tipang'])/df['inter/avg'],
-    y = df['mod2_pct'],
-    hue = 'Fratio',
-    palette = 'Set2'
-    # hue = 'tipang'
+    y = df['pade222/avg+inter/pade222-1'],
+    # hue = 'Fratio',
+    # palette = 'Set2'
+    # hue = 'Fratio'
 )#.set_xlabel('LR/(inter/avg)')
 # plt.title('')
 plt.show()

@@ -8,7 +8,41 @@ os.system('cls') if os.name == 'nt' else os.system('clear')
 x, k1, r, Lb, dt = sp.symbols('x \\kappa_1 r L t')
 
 
+ps = dt * (2 * Lb + dt) / (2 * Lb * r * (Lb - dt))
 ka = dt/(Lb*r)
+
+# ps, ka = sp.symbols("\\kappa_p \\kappa_a")
+
+tsteqn = 2*(ps/ka+k1/ps) + ((ps + k1) / (ps + ka) + (ps + ka) / (ps + k1))/2 -2 - k1/ka
+sp.pprint(sp.simplify(tsteqn))
+sol = sp.solve(tsteqn,k1)
+
+for val in sol:
+    print('sol')
+    sp.pprint(sp.latex(sp.simplify(val)))
+
+
+exit()
+
+curvat = (ka - k1)*x / (Lb/2) + k1
+
+print(sp.latex(sp.simplify(curvat)))
+
+ang = sp.integrate(curvat, x)
+print(sp.latex(sp.simplify(ang)))
+
+exit()
+eqn = (ps / ka - k1 / ka)/(k1 / ps - 1) + ka**2/ps
+print('EQUATION')
+print(sp.latex(sp.simplify(eqn)))
+print('------------------------')
+
+sol = sp.solve(eqn, k1)
+print('SOLUTION k1')
+for val in sol:
+    print(sp.latex(sp.simplify(val)))
+exit()
+
 u = 2 * r * (k1 - ka)
 
 # eqn = (2*(Lb - dt) * r * (k1 - ka)) / (Lb * (1 - k1 * r)) + 1 
