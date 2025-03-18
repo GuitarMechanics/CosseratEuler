@@ -1,7 +1,34 @@
 import sympy as sp
+import os
 
 # Define the variables
 
+os.system('cls') if os.name == 'nt' else os.system('clear')
+
+s, r, Lb, dt = sp.symbols('s, r, L, t')
+
+x = sp.symbols('x')
+
+ka = dt / (Lb * r)
+k1 = ka * (2*Lb + dt) / (2 * (Lb - dt))
+
+curv_x = (ka - k1) * x / (Lb / 2) + k1
+
+ang_s = sp.integrate(curv_x, (x,0,s))
+
+ang_simple = sp.simplify(ang_s)
+print(sp.latex(ang_simple))
+
+
+hor_tbi = sp.sin(ang_simple)
+ver_tbi = sp.cos(ang_simple)
+
+horpos = sp.integrate(hor_tbi,(s,0,Lb))
+
+print(sp.latex(sp.simplify(horpos)))
+
+
+exit()
 x, k1, ka, r, Lb, dt = sp.symbols('x \\kappa_1 \\kappa_avg r L t')
 
 kb = 2 * (ka-k1) * x / Lb + k1

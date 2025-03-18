@@ -13,7 +13,7 @@ ka = dt/(Lb*r)
 
 # ps, ka = sp.symbols("\\kappa_p \\kappa_a")
 
-tsteqn = 2*(ps/ka+k1/ps) + ((ps + k1) / (ps + ka) + (ps + ka) / (ps + k1))/2 -2 - k1/ka
+tsteqn = (ps/ka+k1/ps) + ((ps + k1) / (ps + ka) + (ps + ka) / (ps + k1))/2 -2 - k1/ka
 sp.pprint(sp.simplify(tsteqn))
 sol = sp.solve(tsteqn,k1)
 

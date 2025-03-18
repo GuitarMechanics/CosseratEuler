@@ -37,3 +37,19 @@ Fratio: 9 | Slope: [0.00408282] | Intercept: [2.0208103] | R2 Score: 0.995238222
 Fratio: 11 | Slope: [0.00488293] | Intercept: [2.02737075] | R2 Score: 0.9961279742201684 | slope/FRatio: [0.0004439]
 Fratio: 13 | Slope: [0.00585982] | Intercept: [2.03199956] | R2 Score: 0.9969343843220843 | slope/FRatio: [0.00045076]
 Fratio: 15 | Slope: [0.00724668] | Intercept: [2.03070652] | R2 Score: 0.9990394475323227 | slope/FRatio: [0.00048311]
+
+tang-L*int
+Fratio: 5 | Slope: [1.98836879] | Intercept: [-0.31063792] | R2 Score: 0.9980945448548848 | slope/FRatio: [0.39767376] | X-inter: [0.15622752]
+Fratio: 7 | Slope: [2.00318144] | Intercept: [-0.44285452] | R2 Score: 0.9992330653576118 | slope/FRatio: [0.28616878] | X-inter: [0.22107559]
+Fratio: 9 | Slope: [2.0229316] | Intercept: [-0.58309616] | R2 Score: 0.9995652259217777 | slope/FRatio: [0.22477018] | X-inter: [0.28824314]
+Fratio: 11 | Slope: [2.04505057] | Intercept: [-0.73192364] | R2 Score: 0.9997748477578506 | slope/FRatio: [0.18591369] | X-inter: [0.35790002]
+Fratio: 13 | Slope: [2.08068938] | Intercept: [-0.90126534] | R2 Score: 0.9998363225588369 | slope/FRatio: [0.16005303] | X-inter: [0.43315708]
+Fratio: 15 | Slope: [2.13605601] | Intercept: [-1.10721373] | R2 Score: 0.9997602486661497 | slope/FRatio: [0.14240373] | X-inter: [0.51834489]
+
+tang - Lint+tang
+Fratio: 5 | Slope: [2.98836879] | Intercept: [-0.31063792] | R2 Score: 0.9991555272622716 | slope/FRatio: [0.59767376] | X-inter: [0.10394899]
+Fratio: 7 | Slope: [3.00318144] | Intercept: [-0.44285452] | R2 Score: 0.9996586336470661 | slope/FRatio: [0.42902592] | X-inter: [0.14746179]
+Fratio: 9 | Slope: [3.0229316] | Intercept: [-0.58309616] | R2 Score: 0.99980525170046 | slope/FRatio: [0.33588129] | X-inter: [0.19289095]
+Fratio: 11 | Slope: [3.04505057] | Intercept: [-0.73192364] | R2 Score: 0.9998984338378802 | slope/FRatio: [0.27682278] | X-inter: [0.24036502]
+Fratio: 13 | Slope: [3.08068938] | Intercept: [-0.90126534] | R2 Score: 0.9999253299975216 | slope/FRatio: [0.23697611] | X-inter: [0.29255314]
+Fratio: 15 | Slope: [3.13605601] | Intercept: [-1.10721373] | R2 Score: 0.9998887565359992 | slope/FRatio: [0.2090704] | X-inter: [0.3530593]
